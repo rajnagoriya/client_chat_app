@@ -1,0 +1,130 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") 
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                   Int                   @id @default(autoincrement())
+  username             String                @unique
+  email                String                @unique
+  password             String
+  profilePicture       String?
+  about                String                @default("")
+
+  // Relations
+  groupMembers         GroupMember[]         
+  groupMessagesSent    GroupMessage[]        @relation("GroupMessageSender")
+  sentMessages         Messages[]            @relation("MessageSender")
+  receivedMessages     Messages[]            @relation("MessageReceiver")
+  groupsAdministered   Group[]               @relation("GroupAdministered") 
+  deletedGroupMessages DeletedGroupMessage[] 
+  groupMessagesRead    GroupMessageRead[] 
+  deletedMessages      DeletedMessage[]     
+}
+
+model Group {
+  id             Int             @id @default(autoincrement())
+  name           String
+  avatar         String?
+  about          String?
+  adminId        Int             
+
+  // Relations
+  admin          User            @relation("GroupAdministered", fields: [adminId], references: [id])
+  groupMembers   GroupMember[]   
+  groupMessages  GroupMessage[]  
+}
+
+model GroupMember {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  groupId  Int
+
+  // Relations
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId]) 
+}
+
+model GroupMessage {
+  id                 Int                   @id @default(autoincrement())
+  groupId            Int
+  senderId           Int
+  message            String                @db.LongText
+  type               String                @default("text")
+  createdAt          DateTime              @default(now())
+
+  // Relations
+  group              Group                 @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender             User                  @relation("GroupMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  deletedBy          DeletedGroupMessage[] 
+  groupMessageReads  GroupMessageRead[] 
+
+  @@index([groupId])
+  @@index([senderId])
+}
+
+model GroupMessageRead {
+  id        Int          @id @default(autoincrement())
+  messageId Int
+  userId    Int
+  readAt    DateTime     @default(now())
+
+  // Relations
+  message   GroupMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+model DeletedGroupMessage {
+  id          Int         @id @default(autoincrement())
+  messageId   Int
+  userId      Int
+  deletedAt   DateTime    @default(now())
+
+  // Relations
+  message     GroupMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId]) 
+  @@index([messageId])
+  @@index([userId])
+}
+
+model Messages { 
+  id            Int      @id @default(autoincrement()) 
+  sender        User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade) 
+  senderId      Int
+  receiver      User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade) 
+  receiverId    Int
+  type          String   @default("text")                    
+  message       String   @db.LongText                       
+  messageStatus String   @default("sent")                    
+  createdAt     DateTime @default(now())              
+
+  // Relations
+  deletedMessages DeletedMessage[] 
+}
+
+model DeletedMessage { 
+  id         Int      @id @default(autoincrement())
+  messageId  Int
+  userId     Int
+  deletedAt  DateTime @default(now())
+
+  // Relations
+  message    Messages @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
