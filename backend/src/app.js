@@ -85,7 +85,7 @@ io.on("connection", (socket) => {
     socket.emit("online-users", { onlineUsers: Array.from(onlineUsers.keys()) });
   }
 
-  console.log(`New client connected: ${socket.id} (User ID: ${userId})`);
+  // console.log(`New client connected: ${socket.id} (User ID: ${userId})`);
 
   // Listen for send-msg event for private messages
   socket.on("send-msg", (data) => {
