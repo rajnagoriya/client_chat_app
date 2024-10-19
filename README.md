@@ -1,8 +1,8 @@
 #Installation
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/rajnagoriya/chat_app.git
-    cd chat_app
+    https://github.com/rajnagoriya/client_chat_app.git
+    cd client_chat_app
     ```
 2. **Backend Setup**
    ```bash
