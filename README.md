@@ -20,6 +20,7 @@
     ```
 
 5. **Run database migrations**:
+   
    if in devlopment 
     ```bash
     npx prisma migrate dev
