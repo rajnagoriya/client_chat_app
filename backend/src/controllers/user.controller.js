@@ -52,11 +52,17 @@ export const register = async (req, res, next) => {
     id: user.id,
     email: user.email,
     username: user.username,
+  }, process.env.JWT_SECRET, { expiresIn: '7d' });
+ 
+  const data = {
+    id: user.id,
+    email: user.email,
+    username: user.username,
     profilePicture: user.profilePicture,
     about: user.about
-  }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  }
 
-  return res.status(200).json(new ApiResponse(200, token, "User registered successfully"));
+  return res.status(200).json(new ApiResponse(200, {data, token} ,"User registered successfully"));
 };
 
 export const login = async (req, res, next) => {
@@ -83,15 +89,14 @@ export const login = async (req, res, next) => {
     return next(new ApiError(400, "Invalid password!"));
   }
 
-  const token = jwt.sign({
+  const data = {
     id: user.id,
     email: user.email,
     username: user.username,
     profilePicture: user.profilePicture,
     about: user.about
-  }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-  return res.status(200).json(new ApiResponse(200, token, "User logged in successfully"));
+  }
+  return res.status(200).json(new ApiResponse(200, data, "User logged in successfully"));
 };
 
 // update profile 
@@ -153,16 +158,14 @@ export const updateProfile = async (req, res, next) => {
     data: updateData
   });
 
-  const token = jwt.sign({
+  const data = {
     id: updatedUser.id,
     email: updatedUser.email,
     username: updatedUser.username,
     profilePicture: updatedUser.profilePicture,
     about: updatedUser.about
-  }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-  return res.status(200).json(new ApiResponse(200, token, "Update successfully"));
-
+  }
+  return res.status(200).json(new ApiResponse(200, data, "Update successfully"));
 };
 
 
@@ -187,16 +190,15 @@ export const removeProfilePicture = async (req, res, next) => {
     fs.unlinkSync(filePath);
   }
 
-  // Generate a new token with updated user details
-  const token = jwt.sign({
+  const data = {
     id: updatedUser.id,
     email: updatedUser.email,
     username: updatedUser.username,
     profilePicture: updatedUser.profilePicture,
     about: updatedUser.about
-  }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  }
 
-  return res.status(200).json(new ApiResponse(200, token, "Profile picture removed successfully"));
+  return res.status(200).json(new ApiResponse(200, data, "Profile picture removed successfully"));
 
 }
 
@@ -238,3 +240,26 @@ export const searchUsers = async (req, res, next) => {
     return next(new ApiError(500, error.message || 'Failed to fetch users'));
   }
 };
+
+export const myProfile = async(req, res, next) =>{
+    const id = req.user.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+  
+    if (!user) {
+      return next(new ApiError(400, "User does not exist!"));
+    }
+
+    const data = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      profilePicture: user.profilePicture,
+      about: user.about
+    }
+console.log("data in the my profile :- "+ JSON.stringify(data));
+    return res.status(200).json(new ApiResponse(200, data,));
+
+}

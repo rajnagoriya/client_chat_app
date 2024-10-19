@@ -4,6 +4,7 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 import upload from '../middlewares/multer.middleware.js'
 import {
     login,
+    myProfile,
     register,
     removeProfilePicture,
     searchUsers,
@@ -13,7 +14,7 @@ import {
 
 const router = express.Router();
 
-
+router.get("/myProfile", authMiddleware, asyncHandler(myProfile));
 router.get("/search", authMiddleware, asyncHandler(searchUsers));
 router.post('/register', asyncHandler(register));
 router.post('/login', asyncHandler(login));

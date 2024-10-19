@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { FaArrowLeft } from 'react-icons/fa';
 import ListItem from '../common/ListItem';
+import Loading from '../common/Loading';
 
 function SearchNewUsers() {
  
@@ -106,7 +107,7 @@ function SearchNewUsers() {
           </div>
           <div>
             {
-              loading ? <div>Loading....</div> : <>{
+              loading ? <div><Loading/></div> : <>{
                 allUsers ?
                   <>
                     {allUsers?.map((user) => {

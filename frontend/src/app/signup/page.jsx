@@ -6,7 +6,6 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import AuthForm from "../components/Auth/AuthForm";
 import { useStateContext } from "@/providers/StateContext";
-import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 
 
@@ -23,8 +22,9 @@ export default function SignupPage() {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/v1/user/register`, user);
       if (response) {
-        Cookies.set("chatAppToken", response.data.data, { expires: 7 });
-        const userData = jwtDecode(response.data.data);
+        console.log("data in signup "+ JSON.stringify(response.data.data));
+        Cookies.set("chatAppToken", response.data.data.token, { expires: 7 });
+        const userData = response.data.data.data;
         setUser(userData);
         toast.success(response.data.message ||"Signup successful");
         router.push("/");

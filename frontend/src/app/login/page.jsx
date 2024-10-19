@@ -5,8 +5,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import AuthForm from "../components/Auth/AuthForm";
 import { useStateContext } from "../../providers/StateContext";
-import {jwtDecode} from "jwt-decode";
-import Cookies from "js-cookie";
+
 
 export default function LoginPage() {
   const { state, setUser } = useStateContext();
@@ -21,10 +20,8 @@ export default function LoginPage() {
 
       if (response.data) {
 
-        const token = response.data.data;
-        Cookies.set("chatAppToken", token, { expires: 7 });
-        const userData = jwtDecode(token);
-        setUser(userData);
+        const data = response.data.data;
+        setUser(data);
 
         toast.success("Login successful");
         router.push("/");
