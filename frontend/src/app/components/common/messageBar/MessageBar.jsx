@@ -46,7 +46,6 @@ function MessageBar() {
           setFilePreview(mediaBlobUrl);
         })
         .catch(err => {
-          console.error("Error fetching media blob:", err);
           toast.error("Failed to process the recorded audio.");
         });
     }
@@ -112,6 +111,7 @@ function MessageBar() {
       }
 
       try {
+        setMessage("");
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_HOST}/api/v1/group/${currentGroup.id}/messages`,
           formData,
@@ -119,7 +119,6 @@ function MessageBar() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setMessage("");
         setSelectedFile(null);
         setFilePreview(null);
         setFileType(null);
@@ -142,6 +141,7 @@ function MessageBar() {
       }
 
       try {
+        setMessage("");
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/addMessages`,
           formData,
@@ -158,14 +158,11 @@ function MessageBar() {
           });
           setAddMessage(data);
         }
-
-        setMessage("");
         setSelectedFile(null);
         setFilePreview(null);
         setFileType(null);
       } catch (error) {
         toast.error(error.response?.data?.message || "Something went wrong, try again!");
-        console.error("Failed to send message", error);
       }
     }
   };
