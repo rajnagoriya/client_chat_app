@@ -288,7 +288,6 @@ export const myProfile = async(req, res, next) =>{
       profilePicture: user.profilePicture,
       about: user.about
     }
-console.log("data in the my profile :- "+ JSON.stringify(data));
     return res.status(200).json(new ApiResponse(200, data,));
 
 }
