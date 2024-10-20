@@ -14,7 +14,7 @@ export default function ContactsList() {
       try {
         const token = Cookies.get("chatAppToken");
         const response = await 
-        axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/v1/message/getInitialContacts/${user.id}`, {
+        axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/v1/message/getInitialContacts`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const { users, onlineUsers } = response.data.data;

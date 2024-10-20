@@ -3,7 +3,6 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { AiOutlineFilePdf, AiOutlineFileUnknown, AiOutlineFileWord } from "react-icons/ai";
 import ChatActionIcons from "../common/ChatActionIcons";
 import Loading from "../common/Loading";
 import ForwardMessageModal from "../common/modals/ForwardMessageModal";
@@ -63,23 +62,6 @@ function GroupChatContainer() {
     }
   };
 
-  // Effect to scroll to the selected message
-  useEffect(() => {
-    if (selectedMessageId && messageRefs.current[selectedMessageId]) {
-      messageRefs.current[selectedMessageId].scrollIntoView({ behavior: "smooth", block: "center" });
-
-      const messageElement = messageRefs.current[selectedMessageId];
-      messageElement.classList.add("bg-highlight");
-
-      const timer = setTimeout(() => {
-        messageElement.classList.remove("bg-highlight");
-        setSelectedMessage(null);
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [selectedMessageId, setSelectedMessage]);
-
   // Fetch group messages
   useEffect(() => {
     if (currentGroup) {
@@ -136,6 +118,23 @@ function GroupChatContainer() {
        }
     }
   }, [groupMessages]);
+
+  // Effect to scroll to the selected message
+  useEffect(() => {
+    if (selectedMessageId && messageRefs.current[selectedMessageId]) {
+      messageRefs.current[selectedMessageId].scrollIntoView({ behavior: "smooth", block: "center" });
+
+      const messageElement = messageRefs.current[selectedMessageId];
+      messageElement.classList.add("bg-highlight");
+
+      const timer = setTimeout(() => {
+        messageElement.classList.remove("bg-highlight");
+        setSelectedMessage(null);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedMessageId, setSelectedMessage]);
 
   const filteredMessages = groupMessages?.filter((message) => message.groupId === currentGroup.id);
 

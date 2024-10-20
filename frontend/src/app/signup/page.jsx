@@ -22,7 +22,6 @@ export default function SignupPage() {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/v1/user/register`, user);
       if (response) {
-        console.log("data in signup "+ JSON.stringify(response.data.data));
         Cookies.set("chatAppToken", response.data.data.token, { expires: 7 });
         const userData = response.data.data.data;
         setUser(userData);

@@ -46,7 +46,6 @@ function ChangeProfile() {
   // Handle Save
   const handleSave = async () => {
     const token = Cookies.get('chatAppToken');
-    console.log("token is in chage profile :- "+token)
     if (!token) {
       toast.error("Not authenticated!");
       return;
@@ -96,7 +95,6 @@ function ChangeProfile() {
       }
       toast.success("Profile updated successfully!");
     } catch (error) {
-      console.log("error in change profile + "+ error);
       toast.error("An error occurred while updating the profile.");
     }
 

@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import AuthForm from "../components/Auth/AuthForm";
 import { useStateContext } from "../../providers/StateContext";
-
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const { state, setUser } = useStateContext();
@@ -19,10 +19,10 @@ export default function LoginPage() {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/v1/user/login`, userFormData);
 
       if (response.data) {
-
-        const data = response.data.data;
-        setUser(data);
-
+        Cookies.set("chatAppToken", response.data.data.token, { expires: 7 });
+        const data = response.data.data.data;
+        // setUser(data);
+ console.log("user login called !!");
         toast.success("Login successful");
         router.push("/");
       }

@@ -3,11 +3,13 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Loading from "../Loading";
 
 const ForwardMessageModal = ({ isOpen, onClose, message, userContacts, groups }) => {
   const { state,setAddMessage } = useStateContext();
   // const { user, socket } = state;
 
+  const [loading, setLoading] = useState(false);
   const [selectedTargets, setSelectedTargets] = useState([]);
   const token = Cookies.get("chatAppToken");
 
@@ -30,6 +32,7 @@ const ForwardMessageModal = ({ isOpen, onClose, message, userContacts, groups })
     };
 
     try {
+      setLoading(true);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/forward`,
         payload,
@@ -45,7 +48,8 @@ const ForwardMessageModal = ({ isOpen, onClose, message, userContacts, groups })
       }
     } catch (error) {
       toast.error("Failed to forward message.");
-      console.error("Forward message error:", error);
+    }finally{
+      setLoading(false);
     }
   };
 

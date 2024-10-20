@@ -24,7 +24,7 @@ function ChatContainer() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/getMessages/${user?.id}/${currentChatUser?.id}`,
+          `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/getMessages/${currentChatUser?.id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessages(response.data.data);
@@ -39,6 +39,42 @@ function ChatContainer() {
       getMessages();
     }
   }, [currentChatUser, setMessages, user?.id]);
+
+
+// Handle forward message logic
+const handleForwardMessage = (message) => {
+  setMessageToForward(message);
+  setForwardModalOpen(true);
+};
+
+// Close the forward modal
+const handleCloseForwardModal = () => {
+  setForwardModalOpen(false);
+  setMessageToForward(null);
+};
+
+// Delete Message function
+const handleDeleteMessage = async (messageId, isDeleteForEveryone) => {
+  const deleteUrl = isDeleteForEveryone
+    ? `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/deleteForEveryone/${messageId}`
+    : `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/deleteForMe/${messageId}`;
+
+  try {
+    const response = await axios.delete(deleteUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (isDeleteForEveryone) {
+      socket.emit('delete-msg-for-everyone', { messageId, to: currentChatUser?.id });
+    }
+    if (response.status === 200) {
+      setMessages(messages.filter((msg) => msg.id !== messageId));
+      toast.success(isDeleteForEveryone ? "Message deleted for everyone." : "Message deleted from your chat.");
+    }
+  } catch (error) {
+    toast.error("Failed to delete message.");
+  }
+};
+
 
   // Scroll to the first unread message or the latest message at the bottom
   useEffect(() => {
@@ -80,43 +116,7 @@ function ChatContainer() {
       (message.senderId === user.id && message.receiverId === currentChatUser.id)
   );
 
-  // Handle forward message logic
-  const handleForwardMessage = (message) => {
-    setMessageToForward(message);
-    setForwardModalOpen(true);
-  };
-
-  // Close the forward modal
-  const handleCloseForwardModal = () => {
-    setForwardModalOpen(false);
-    setMessageToForward(null);
-  };
-
-  // Delete Message function
-  const handleDeleteMessage = async (messageId, isDeleteForEveryone) => {
-    const deleteUrl = isDeleteForEveryone
-      ? `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/deleteForEveryone/${messageId}`
-      : `${process.env.NEXT_PUBLIC_HOST}/api/v1/message/deleteForMe/${messageId}`;
-
-    try {
-      setLoading(true);
-      const response = await axios.delete(deleteUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (isDeleteForEveryone) {
-        socket.emit('delete-msg-for-everyone', { messageId, to: currentChatUser?.id });
-      }
-      if (response.status === 200) {
-        setMessages(messages.filter((msg) => msg.id !== messageId));
-        toast.success(isDeleteForEveryone ? "Message deleted for everyone." : "Message deleted from your chat.");
-      }
-    } catch (error) {
-      toast.error("Failed to delete message.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   return (
     loading ? (
       <div><Loading /></div>
