@@ -6,10 +6,18 @@ import { io, onlineUsers } from '../app.js';
 
 
 export const getMessages = async (req, res, next) => {
-  const { from, to } = req.params;
-  const userId = req.user.id;
+  const from = req.user.id ;
+  const { to } = req.params;
 
-  try {
+
+  const user = await prisma.user.findUnique({
+    where: { id: parseInt(to) },
+  })
+
+  if(!user){
+    return next(new ApiError(500, "Reciver user not found"));
+  }
+
     const messages = await prisma.messages.findMany({
       where: {
         OR: [
@@ -23,7 +31,7 @@ export const getMessages = async (req, res, next) => {
     // Get all the messages that this user has deleted
     const deletedMessages = await prisma.deletedMessage.findMany({
       where: {
-        userId: userId,
+        userId: from,
         messageId: { in: messages.map((msg) => msg.id) },
       },
       select: { messageId: true },
@@ -63,13 +71,12 @@ export const getMessages = async (req, res, next) => {
     }
 
     return res.status(200).json(new ApiResponse(200, filteredMessages));
-  } catch (error) {
-    return next(new ApiError(500, "Error fetching messages"));
-  }
+  
 };
 
 export const addMessage = async (req, res, next) => {
-  const { message, from, to } = req.body;
+  const { message, to } = req.body;
+  const from = req.user.id ;
 
   // Check if necessary data is missing
   if (!from || !to || (!message && !req.file)) {
@@ -95,7 +102,6 @@ export const addMessage = async (req, res, next) => {
       newMessageData.message = message;
   }
 
-  try {
       // Save the message to the database
       const newMessage = await prisma.messages.create({
           data: newMessageData,
@@ -114,18 +120,11 @@ export const addMessage = async (req, res, next) => {
       }
 
       return res.status(200).json(new ApiResponse(200, newMessage, "Message sent"));
-  } catch (error) {
-      return next(new ApiError(400, "Error while sending message"));
-  }
 };
 
 export const getInitialContactsWithMessages = async (req, res, next) => {
-  const userId = parseInt(req.params.from);
-  if (!userId) {
-    return next(new ApiError(400, "Error while fetching user!!"));
-  }
+  const userId = req.user.id;
 
-  try {
     // Fetch user with sent and received messages, and filter deleted messages
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -140,6 +139,10 @@ export const getInitialContactsWithMessages = async (req, res, next) => {
         },
       },
     });
+
+    if(!user){
+      return next(new ApiError(400, "user not found please login again!!!"));
+    }
 
     // Combine sent and received messages
     const messages = [...user.sentMessages, ...user.receivedMessages];
@@ -231,18 +234,12 @@ export const getInitialContactsWithMessages = async (req, res, next) => {
         onlineUsers: Array.from(onlineUsers.keys()),
       }, "Initial data")
     );
-
-  } catch (error) {
-    console.log("error in initial contact is :- "+error);
-    return next(new ApiError(500, "Error fetching initial contacts with messages"));
-  }
 };
 
 export const clearChat = async (req, res, next) => {
   const { currentChatUserId } = req.params; 
   const userId = req.user.id; 
 
-  try {
     // Fetch all messages between the two users
     const messages = await prisma.messages.findMany({
       where: {
@@ -282,17 +279,14 @@ export const clearChat = async (req, res, next) => {
     }
 
     return res.status(200).json(new ApiResponse(200, {}, 'Chat cleared successfully.'));
-  } catch (error) {
-    return next(new ApiError(500, 'Failed to clear chat.'));
-  }
 };
 
 // Delete message for the current user (Delete for Me)
 export const deleteMessageForMe = async (req, res, next) => {
   const { messageId } = req.params;
   const userId = req.user.id;
-console.log("msg id and user id is  :- "+ messageId, userId);
-  try {
+
+
     // Check if the message exists
     const message = await prisma.messages.findUnique({ where: { id: parseInt(messageId) } });
 
@@ -320,9 +314,7 @@ console.log("msg id and user id is  :- "+ messageId, userId);
     });
 
     return res.status(200).json(new ApiResponse(200, "Message deleted for you successfully."));
-  } catch (error) {
-    return next(new ApiError(500, "Failed to delete message for you."));
-  }
+ 
 };
 
 // Delete message for everyone (Delete for both sender and receiver)
@@ -330,7 +322,6 @@ export const deleteMessageForEveryone = async (req, res, next) => {
   const { messageId } = req.params;
   const userId = req.user.id;
 
-  try {
     // Fetch the message to verify if the user is the sender
     const message = await prisma.messages.findUnique({
       where: { id: parseInt(messageId) },
@@ -364,9 +355,6 @@ export const deleteMessageForEveryone = async (req, res, next) => {
     }
 
     return res.status(200).json(new ApiResponse(200, "Message deleted for everyone successfully."));
-  } catch (error) {
-    return next(new ApiError(500, "Failed to delete message for everyone."));
-  }
 };
 
 export const forwardMessage = async (req, res, next) => {
@@ -376,7 +364,6 @@ export const forwardMessage = async (req, res, next) => {
     return next(new ApiError(400, "Missing required fields"));
   }
 
-  try {
     // Fetch the original message based on messageType
     let originalMessage;
     if (messageType === 'private') {
@@ -461,7 +448,5 @@ export const forwardMessage = async (req, res, next) => {
     }
    
     return res.status(200).json(new ApiResponse(200, newMessages, "Message forwarded successfully"));
-  } catch (error) {
-    return next(new ApiError(500, "Error while forwarding message"));
-  }
+
 };

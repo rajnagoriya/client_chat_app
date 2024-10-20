@@ -14,15 +14,19 @@ import upload from '../middlewares/multer.middleware.js';
 
 
 const router = express.Router();
+
+// All routes are protected
+router.use(authMiddleware);
+
 // add auth middleware 
-router.get('/getMessages/:from/:to', authMiddleware,(getMessages));
-router.get("/getInitialContacts/:from",asyncHandler(getInitialContactsWithMessages));
+router.get('/getMessages/:to', asyncHandler(getMessages));
+router.get("/getInitialContacts", asyncHandler(getInitialContactsWithMessages));
 
-router.post('/addMessages', upload.single('file'),(addMessage));
-router.post('/forward', authMiddleware, (forwardMessage));
+router.post('/addMessages', upload.single('file'), asyncHandler(addMessage));
+router.post('/forward', asyncHandler(forwardMessage));
 
-router.delete("/clear/:currentChatUserId", authMiddleware, (clearChat)); 
-router.delete('/deleteForMe/:messageId', authMiddleware, (deleteMessageForMe));
-router.delete('/deleteForEveryone/:messageId', authMiddleware, (deleteMessageForEveryone));
+router.delete("/clear/:currentChatUserId", asyncHandler(clearChat));
+router.delete('/deleteForMe/:messageId', asyncHandler(deleteMessageForMe));
+router.delete('/deleteForEveryone/:messageId', asyncHandler(deleteMessageForEveryone));
 
 export default router;

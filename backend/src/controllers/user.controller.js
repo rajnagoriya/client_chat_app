@@ -5,9 +5,17 @@ import prisma from '../utils/prisma.js';
 import bcrypt from 'bcrypt';
 import fs from "fs"
 import path from 'path';
+import { loginSchema, registerSchema, updateProfileSchema } from '../validations/userValidation.js';
 
 export const register = async (req, res, next) => {
-  // Trim the incoming username, email, and password
+
+  const validationResult = registerSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.errors.map((err) => err.message).join(", ");
+    return next(new ApiError(400, errors));
+  }
+
   const username = req.body.username?.trim();
   const email = req.body.email?.trim();
   const password = req.body.password?.trim();
@@ -66,6 +74,14 @@ export const register = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
+
+  const validationResult = loginSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.errors.map((err) => err.message).join(", ");
+    return next(new ApiError(400, errors));
+  }
+  
   // Trim the incoming email and password
   const email = req.body.email?.trim();
   const password = req.body.password?.trim();
@@ -89,6 +105,12 @@ export const login = async (req, res, next) => {
     return next(new ApiError(400, "Invalid password!"));
   }
 
+  const token = jwt.sign({
+    id: user.id,
+    email: user.email,
+    username: user.username,
+  }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
   const data = {
     id: user.id,
     email: user.email,
@@ -96,11 +118,18 @@ export const login = async (req, res, next) => {
     profilePicture: user.profilePicture,
     about: user.about
   }
-  return res.status(200).json(new ApiResponse(200, data, "User logged in successfully"));
+  return res.status(200).json(new ApiResponse(200, {data, token}, "User logged in successfully"));
 };
 
 // update profile 
 export const updateProfile = async (req, res, next) => {
+
+  const validationResult = updateProfileSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.errors.map((err) => err.message).join(", ");
+    return next(new ApiError(400, errors));
+  }
 
   const id = req.user.id;
   const about = req.body.about?.trim();

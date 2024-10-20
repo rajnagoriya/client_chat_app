@@ -5,11 +5,23 @@ import prisma from '../utils/prisma.js';
 import { io, onlineUsers } from '../app.js';
 import fs from 'fs';
 import path from 'path';
+import { createGroupSchema } from '../validations/groupValidation.js';
 
 // Create a new group
 export const createGroup = async (req, res, next) => {
+  const avatar = req.file ? req.file.path : '';
   const { name, adminId, about } = req.body;
-  const avatar = req.file ? req.file.path : null;
+
+  // const validation = createGroupSchema.safeParse(...req.body);
+
+  // if (!validation.success) {
+  //   const errors = validation.error.errors.map((err) => err.message).join(', ');
+  //   return next(new ApiError(400, `Validation error: ${errors}`));
+  // }
+
+ 
+  
+  // const avatar = req.file ? req.file.path : null;
 
   // Validation
   if (!name || !adminId) {
@@ -80,8 +92,6 @@ export const createGroup = async (req, res, next) => {
     }
     return res.status(201).json(new ApiResponse(201, newGroup, 'Group created successfully.'));
   } catch (error) {
-    console.error('Error creating group:', error);
-
     // Handle file cleanup in case of error
     if (avatar) {
       fs.unlink(path.resolve(avatar), (err) => {

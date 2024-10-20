@@ -16,13 +16,16 @@ const router = express.Router();
 
 router.get("/myProfile", authMiddleware, asyncHandler(myProfile));
 router.get("/search", authMiddleware, asyncHandler(searchUsers));
+
 router.post('/register', asyncHandler(register));
 router.post('/login', asyncHandler(login));
+
 router.patch('/update-profile',
     authMiddleware,
     upload.single('profilePicture'),
     asyncHandler(updateProfile)
 );
+
 router.delete('/update-profile',
     authMiddleware,
     asyncHandler(removeProfilePicture)

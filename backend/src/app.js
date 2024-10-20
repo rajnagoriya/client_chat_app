@@ -26,6 +26,12 @@ app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
 
 // Routes
+app.get("/",(req,res,next)=>{
+  res.status(200).json({
+     success: true,
+     message: 'Wellcome to chatApp.'
+  })
+});
 app.use("/api/v1/group", groupRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/message", messageRoute);
@@ -117,7 +123,6 @@ socket.on('delete-group-msg-for-everyone', (data) => {
 
   // Handle disconnection
   socket.on("disconnect", () => {
-    console.log(`Socket disconnected: ${socket.id} (User ID: ${userId})`);
     if (userId) {
       const userSockets = onlineUsers.get(userId);
       if (userSockets) {
