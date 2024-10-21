@@ -15,6 +15,7 @@ function AddUsers({ onClose }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [loading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (searchTerm === '') {
@@ -52,6 +53,7 @@ function AddUsers({ onClose }) {
     };
   
     try {
+      setIsLoading(true);
       const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/v1/group/${currentGroup.id}/add`, data, {
         headers: {
           'Content-Type': 'application/json',
@@ -62,8 +64,9 @@ function AddUsers({ onClose }) {
       setIsInfoOpen(false)
       onClose();
     } catch (error) {
-      console.log("Error in add user is: ", error);
       toast.error(error.response?.data?.message || 'Failed to add users.');
+    }finally{
+      setIsLoading(false);
     }
   };
   
@@ -123,8 +126,10 @@ function AddUsers({ onClose }) {
             </div>
           </div>
           <div className="modal-action">
-            <button type="submit" className="btn bg-[#007d88] ">
-              Add
+            <button type="submit" className={`${
+                loading ? "btn bg-[#6b9292]":"btn bg-[#007d88]"
+              }`}>
+                {loading? "Adding...":"Add"}
             </button>
           </div>
         </form>

@@ -18,6 +18,7 @@ function CreateGroupModal({ onClose }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [loading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (searchTerm === '') {
@@ -65,6 +66,7 @@ function CreateGroupModal({ onClose }) {
     }
 
     try {
+      setIsLoading(true);
       const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/v1/group/create`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -78,6 +80,8 @@ function CreateGroupModal({ onClose }) {
      
     } catch (error) {
       toast.error('Failed to create group.');
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -149,8 +153,10 @@ function CreateGroupModal({ onClose }) {
             </div>
           </div>
           <div className="modal-action">
-            <button type="submit" className="btn bg-[#007d88] ">
-              Create Group
+            <button type="submit" className={`${
+                loading ? "btn bg-[#6b9292]":"btn bg-[#007d88]"
+              }`}>
+                {loading? "creating..." : "Create Group"}
             </button>
           </div>
         </form>

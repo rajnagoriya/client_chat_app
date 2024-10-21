@@ -22,7 +22,7 @@ if(!user){
   return ;
 }
   return (
-        <div className={`grid h-screen w-screen max-h-screen max-w-full overflow-hidden 
+        <div className={`grid h-screen w-screen max-w-full  overflow-hidden 
           ${isSmallscreen ? 'grid-cols-1' : 'grid-cols-[30%_70%]'}
         `}>
           {!isSmallscreen ? (

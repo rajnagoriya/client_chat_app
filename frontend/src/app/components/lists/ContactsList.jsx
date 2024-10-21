@@ -22,7 +22,6 @@ export default function ContactsList() {
         setOnlineUsers(onlineUsers);
       } catch (err) {
         toast.error("something went wrong !!!");
-        console.error("Error in initial user loading:", err);
       }
     };
 

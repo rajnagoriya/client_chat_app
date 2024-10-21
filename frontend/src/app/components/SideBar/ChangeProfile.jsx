@@ -68,7 +68,7 @@ function ChangeProfile() {
 
     try {
       let response;
-
+      setLoading(true);
       if(isDeleteImage  && isEditingImage){
         response = await axios.delete(
           `${process.env.NEXT_PUBLIC_HOST}/api/v1/user/update-profile/?url=${user?.profilePicture}`, 
@@ -96,6 +96,8 @@ function ChangeProfile() {
       toast.success("Profile updated successfully!");
     } catch (error) {
       toast.error("An error occurred while updating the profile.");
+    }finally{
+      setLoading(false);
     }
 
     setIsEditingName(false);
@@ -202,14 +204,18 @@ function ChangeProfile() {
         <div className="flex justify-end mt-auto">
           <button
             className={`
-              btn bg-[#007d88] 
+              ${
+                loading ? "btn bg-[#6b9292]":"btn bg-[#007d88]"
+              }
               text-white 
               ${hasChanged.name || hasChanged.about || isEditingImage 
               ? '' : 'disabled:opacity-50'}`}
             onClick={handleSave}
             disabled={!hasChanged.name && !hasChanged.about && !isEditingImage}
           >
-            Save
+            {
+              loading ? "saving...": "Save"
+            }
           </button>
         </div>
 

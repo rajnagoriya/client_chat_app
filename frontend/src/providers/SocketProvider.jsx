@@ -92,7 +92,6 @@ const SocketProvider = ({ children }) => {
         // Listen for incoming group messages
         socketRef.current.on('group-msg-receive', (data) => {
           const { groupId, message } = data;
-          console.log("data in the group message :- "+ groupId, message );
           if (message) {
             if (currentGroup && currentGroup.id === groupId) {
               addGroupMessage(message);

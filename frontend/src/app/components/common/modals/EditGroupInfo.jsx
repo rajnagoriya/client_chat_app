@@ -15,7 +15,7 @@ function EditGroupInfo({ onClose }) {
   const [groupName, setGroupName] = useState('');
   const [groupAvatar, setGroupAvatar] = useState(null);
   const [groupAbout,setGroupAbout] = useState('');
-
+  const [loading, setIsLoading] = useState(false);
 
 
   const handleAvatarChange = (e) => {
@@ -41,6 +41,7 @@ function EditGroupInfo({ onClose }) {
     }
 
     try {
+      setIsLoading(true);
       const response = await axios.put(`${process.env.NEXT_PUBLIC_HOST}/api/v1/group/${currentGroup.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -55,7 +56,8 @@ function EditGroupInfo({ onClose }) {
       onClose();   
     } catch (error) {
       toast.error('Failed to edit group Info.');
-      console.log("failed update group info "+ error);
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -107,8 +109,10 @@ function EditGroupInfo({ onClose }) {
             ></textarea>
           </div>
           <div className="modal-action">
-            <button type="submit" className="btn bg-[#007d88] ">
-               Edit
+            <button type="submit" className={`${
+                loading ? "btn bg-[#6b9292]":"btn bg-[#007d88]"
+              }`}>
+               {loading? "Editing..." : "Edit"}
             </button>
           </div>
         </form>

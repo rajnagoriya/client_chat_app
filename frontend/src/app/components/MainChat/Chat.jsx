@@ -18,7 +18,7 @@ function Chat() {
     border-conversation-border
     border-l w-full
     bg-conversation-panel-background 
-    flex flex-col h-[100vh] z-10 ">
+    flex flex-col h-full z-10 ">
     <ChatHeader/>
     {currentGroup ? <GroupChatContainer/> : <ChatContainer/>}
     <MessageBar/>

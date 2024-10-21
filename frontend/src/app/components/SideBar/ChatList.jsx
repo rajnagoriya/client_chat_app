@@ -15,7 +15,7 @@ function ChatList() {
 
 
   return (
-    <div className="relative flex flex-col max-h-screen w-full">
+    <div className="relative flex flex-col h-full w-full">
       {contactSearchPage ? (
         <SearchNewUsers />
       ) : (
