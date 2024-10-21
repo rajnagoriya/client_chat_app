@@ -12,17 +12,6 @@ export const createGroup = async (req, res, next) => {
   const avatar = req.file ? req.file.path : '';
   const { name, adminId, about } = req.body;
 
-  // const validation = createGroupSchema.safeParse(...req.body);
-
-  // if (!validation.success) {
-  //   const errors = validation.error.errors.map((err) => err.message).join(', ');
-  //   return next(new ApiError(400, `Validation error: ${errors}`));
-  // }
-
- 
-  
-  // const avatar = req.file ? req.file.path : null;
-
   // Validation
   if (!name || !adminId) {
     return next(new ApiError(400, 'Group name and admin ID are required.'));
@@ -207,7 +196,7 @@ console.log("the userid and the adminid is :-"+userId, adminId)
 export const addGroupMember = async (req, res, next) => {
   const { groupId } = req.params;
   const { userIds, adminId } = req.body;
-console.log("the groupid userid adminid "+ groupId,JSON.stringify(userIds),adminId)
+
   // Validation: Ensure adminId and userIds are provided
   if (!userIds || !adminId || !Array.isArray(userIds) || userIds.length === 0) {
     return next(new ApiError(400, 'Admin ID and at least one user ID are required.'));

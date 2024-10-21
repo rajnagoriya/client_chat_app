@@ -22,9 +22,6 @@ const fileFilter = (req, file, cb) => {
   const fileExt = path.extname(file.originalname).toLowerCase();
   const mimeType = file.mimetype;
 
-  console.log("File extension:", fileExt);
-  console.log("File mimetype:", mimeType);
-
   // Check the file extension
   const isAllowed = [
     videoTypes,
